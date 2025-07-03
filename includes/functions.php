@@ -10,11 +10,11 @@ function load_site_settings(): array {
     $settings_file_path = __DIR__ . '/../config/site_settings.json';
 
     $default_settings = [
-        'site_name'          => 'DIPUG',
+        'site_name'          => 'AROSOFT',
         'site_tagline'       => 'Digital Innovation and Programming',
         'posts_per_page'     => 10,
-        'contact_email'      => 'info@dipug.com',
-        'footer_copyright'   => '&copy; {year} dipug.com. All Rights Reserved.',
+        'contact_email'      => 'info@arosoft.io',
+        'footer_copyright'   => '&copy; {year} AROSOFT Innovations. All Rights Reserved.',
     ];
 
     if (!file_exists($settings_file_path)) {

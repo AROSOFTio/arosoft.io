@@ -1,14 +1,14 @@
 <?php
 // includes/header.php
 
-$page_title       = $page_title ?? (defined('SITE_NAME') ? SITE_NAME : 'dipug.com');
-$meta_description = $meta_description ?? 'Welcome to ' . (defined('SITE_NAME') ? SITE_NAME : 'dipug.com');
+$page_title       = $page_title ?? (defined('SITE_NAME') ? SITE_NAME : 'AROSOFT');
+$meta_description = $meta_description ?? 'Welcome to ' . (defined('SITE_NAME') ? SITE_NAME : 'AROSOFT');
 $meta_keywords    = $meta_keywords ?? '';
 
 defined('BASE_URL') or define('BASE_URL', '/');
 if (!defined('SITE_NAME')) {
     $site_settings_for_header_name = load_site_settings();
-    define('SITE_NAME', $site_settings_for_header_name['site_name'] ?? 'dipug.com');
+    define('SITE_NAME', $site_settings_for_header_name['site_name'] ?? 'AROSOFT');
 }
 
 global $page;

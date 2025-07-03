@@ -84,10 +84,17 @@ $category_id = !empty($_POST['post_category_id']) ? (int)$_POST['post_category_i
 $status_to_save = (isset($_POST['post_status']) && in_array($_POST['post_status'], ['published', 'draft'])) ? $_POST['post_status'] : 'draft';
 $meta_description = trim($_POST['post_meta_description'] ?? '');
 $meta_keywords = trim($_POST['post_meta_keywords'] ?? '');
+$meta_title = trim($_POST['post_meta_title'] ?? ''); // New field
+$opengraph_image_url = trim($_POST['post_opengraph_image_url'] ?? ''); // New field
 $excerpt = trim($_POST['post_excerpt'] ?? '');
 $user_id = $_SESSION['admin_user_id']; // Author ID
 
 $errors = [];
+
+// Validate Open Graph Image URL
+if (!empty($opengraph_image_url) && !filter_var($opengraph_image_url, FILTER_VALIDATE_URL)) {
+    $errors[] = "Open Graph Image URL is not a valid URL.";
+}
 
 // Validate title
 if (empty($title)) {
@@ -173,13 +180,15 @@ if (empty($excerpt) && !empty($clean_content)) {
 }
 
 $category_id_to_save = ($category_id === 0 || $category_id === '') ? null : $category_id;
+$meta_title_to_save = empty($meta_title) ? null : $meta_title; // New
 $meta_description_to_save = empty($meta_description) ? null : $meta_description;
 $meta_keywords_to_save = empty($meta_keywords) ? null : $meta_keywords;
+$opengraph_image_url_to_save = empty($opengraph_image_url) ? null : $opengraph_image_url; // New
 $excerpt_to_save = empty($excerpt) ? null : $excerpt;
 
 
-$sql = "INSERT INTO posts (user_id, title, slug, content, category_id, status, featured_image, meta_description, meta_keywords, excerpt, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+$sql = "INSERT INTO posts (user_id, title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt, view_count, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())"; // Added meta_title, opengraph_image_url, view_count (default 0)
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
@@ -192,10 +201,10 @@ if (!$stmt) {
 }
 
 // Order: user_id (i), title (s), slug (s), content (s), category_id (i), status (s),
-// featured_image (s), meta_description (s), meta_keywords (s), excerpt (s)
-$stmt->bind_param("isssisssss",
+// featured_image (s), meta_title (s), meta_description (s), meta_keywords (s), opengraph_image_url (s), excerpt (s)
+$stmt->bind_param("isssisssssss", // Changed from isssisssss
     $user_id, $title, $slug, $clean_content, $category_id_to_save, $status_to_save,
-    $featured_image_filename, $meta_description_to_save, $meta_keywords_to_save, $excerpt_to_save
+    $featured_image_filename, $meta_title_to_save, $meta_description_to_save, $meta_keywords_to_save, $opengraph_image_url_to_save, $excerpt_to_save
 );
 
 if ($stmt->execute()) {
