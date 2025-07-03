@@ -28,7 +28,8 @@ $search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status_filter = isset($_GET['status']) ? trim($_GET['status']) : '';
 $category_filter_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
 
-$sql = "SELECT p.id, p.title, p.slug, p.status, p.created_at, p.updated_at, c.name as category_name 
+// Added p.view_count, p.meta_title, p.meta_description to the SELECT statement
+$sql = "SELECT p.id, p.title, p.slug, p.status, p.created_at, p.updated_at, p.view_count, p.meta_title, p.meta_description, c.name as category_name
         FROM posts p 
         LEFT JOIN categories c ON p.category_id = c.id";
 $count_sql = "SELECT COUNT(p.id) as total 
@@ -168,7 +169,9 @@ $categories_for_filter = ($categories_result_filter && $categories_result_filter
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">SEO</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Created</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -186,6 +189,19 @@ $categories_for_filter = ($categories_result_filter && $categories_result_filter
                                 <div class="text-xs text-gray-500">Slug: <?php echo esc_html($post['slug'] ?? 'no-slug'); ?></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo esc_html($post['category_name'] ?? 'N/A'); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                <?php
+                                    $has_meta_title = !empty($post['meta_title']);
+                                    $has_meta_desc = !empty($post['meta_description']);
+                                    if ($has_meta_title && $has_meta_desc) {
+                                        echo '<i data-lucide="check-circle" class="w-5 h-5 text-green-500 mx-auto" title="Meta Title & Description are set"></i>';
+                                    } elseif ($has_meta_title || $has_meta_desc) {
+                                        echo '<i data-lucide="alert-circle" class="w-5 h-5 text-yellow-500 mx-auto" title="Partial SEO: ' . ($has_meta_title ? 'Title set; ' : '') . ($has_meta_desc ? 'Desc set; ' : '') . '"></i>';
+                                    } else {
+                                        echo '<i data-lucide="x-circle" class="w-5 h-5 text-red-500 mx-auto" title="Meta Title & Description are missing"></i>';
+                                    }
+                                ?>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?php 
                                     $status_val = $post['status'] ?? 'unknown'; 
@@ -200,6 +216,7 @@ $categories_for_filter = ($categories_result_filter && $categories_result_filter
                                     <?php echo esc_html(ucfirst($status_val)); ?>
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"><?php echo esc_html($post['view_count'] ?? 0); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo format_date($post['created_at'] ?? null, 'M j, Y H:i'); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                 <?php
@@ -243,7 +260,7 @@ $categories_for_filter = ($categories_result_filter && $categories_result_filter
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
+                        <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
                             No posts found matching your criteria.
                         </td>
                     </tr>

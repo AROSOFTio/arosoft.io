@@ -12,11 +12,11 @@ $site_settings = load_site_settings();
 
 // --- CONFIGURATION (Use loaded settings, fallback to defaults if needed) ---
 define('BASE_URL', '/');
-define('SITE_NAME', $site_settings['site_name'] ?? 'dipug.com');
-define('SITE_TAGLINE', $site_settings['site_tagline'] ?? 'Digital Innovation and Programming');
+define('SITE_NAME', $site_settings['site_name'] ?? 'AROSOFT');
+define('SITE_TAGLINE', $site_settings['site_tagline'] ?? 'Innovating Future Technology');
 define('POSTS_PER_PAGE', (int)($site_settings['posts_per_page'] ?? 10));
-define('CONTACT_EMAIL', $site_settings['contact_email'] ?? 'info@example.com');
-define('FOOTER_COPYRIGHT', $site_settings['footer_copyright'] ?? '&copy; {year} dipug.com. All Rights Reserved.');
+define('CONTACT_EMAIL', $site_settings['contact_email'] ?? 'info@arosoft.io');
+define('FOOTER_COPYRIGHT', $site_settings['footer_copyright'] ?? '&copy; {year} AROSOFT Innovations. All Rights Reserved.');
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'u662439561_main5_');

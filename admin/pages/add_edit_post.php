@@ -56,6 +56,8 @@ $post_status = 'published';
 $post_featured_image = '';
 $post_meta_description = '';
 $post_meta_keywords = '';
+$post_meta_title = ''; // New
+$post_opengraph_image_url = ''; // New
 $post_excerpt = '';
 
 $is_editing = isset($_GET['id']) && !empty($_GET['id']);
@@ -71,7 +73,8 @@ if ($is_editing && $post_id <= 0) {
 $form_action_target = $is_editing ? 'edit_post_process.php' : 'add_post_process.php';
 
 if ($is_editing) {
-    $stmt = $conn->prepare("SELECT title, slug, content, category_id, status, featured_image, meta_description, meta_keywords, excerpt FROM posts WHERE id = ?");
+    // Added meta_title, opengraph_image_url to SELECT
+    $stmt = $conn->prepare("SELECT title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt FROM posts WHERE id = ?");
     if ($stmt) {
         $stmt->bind_param("i", $post_id);
         $stmt->execute();
@@ -84,8 +87,10 @@ if ($is_editing) {
             $post_category_id = $post['category_id']; // Current category_id for the post
             $post_status = $post['status'];
             $post_featured_image = $post['featured_image'];
+            $post_meta_title = $post['meta_title'] ?? ''; // New
             $post_meta_description = $post['meta_description'] ?? '';
             $post_meta_keywords = $post['meta_keywords'] ?? '';
+            $post_opengraph_image_url = $post['opengraph_image_url'] ?? ''; // New
             $post_excerpt = $post['excerpt'] ?? '';
         } else {
             $_SESSION['flash_message'] = "Post not found.";
@@ -273,6 +278,13 @@ if ($is_editing && $post_status === 'published' && !empty($post_slug)) {
                     <h3 class="text-lg font-medium text-gray-900 mb-3 border-b pb-2">SEO Settings</h3>
                     <div class="space-y-4">
                         <div>
+                            <label for="post_meta_title" class="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                            <input type="text" name="post_meta_title" id="post_meta_title" value="<?php echo esc_html($form_data['post_meta_title'] ?? ($post_meta_title ?? '')); ?>"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-admin-primary focus:border-admin-primary sm:text-sm"
+                                   placeholder="Custom title for search engines (optional)" maxlength="70">
+                            <p class="text-xs text-gray-500 mt-1">If blank, the main post title will be used. Recommended: 50-70 characters. <span id="meta_title_char_count">0</span>/70</p>
+                        </div>
+                        <div>
                             <label for="post_meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
                             <textarea name="post_meta_description" id="post_meta_description" rows="3" maxlength="160"
                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-admin-primary focus:border-admin-primary sm:text-sm"
@@ -285,6 +297,13 @@ if ($is_editing && $post_status === 'published' && !empty($post_slug)) {
                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-admin-primary focus:border-admin-primary sm:text-sm"
                                    placeholder="e.g., keyword1, keyword2, keyword3">
                             <p class="text-xs text-gray-500 mt-1">Comma-separated keywords.</p>
+                        </div>
+                        <div>
+                            <label for="post_opengraph_image_url" class="block text-sm font-medium text-gray-700 mb-1">Open Graph Image URL</label>
+                            <input type="url" name="post_opengraph_image_url" id="post_opengraph_image_url" value="<?php echo esc_html($form_data['post_opengraph_image_url'] ?? ($post_opengraph_image_url ?? '')); ?>"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-admin-primary focus:border-admin-primary sm:text-sm"
+                                   placeholder="Full URL to an image for social media (e.g., 1200x630px)">
+                            <p class="text-xs text-gray-500 mt-1">If blank, the featured image might be used by social platforms.</p>
                         </div>
                     </div>
                 </div>
@@ -429,7 +448,17 @@ if(metaDescTextarea && metaDescCharCount) {
         metaDescCharCount.textContent = metaDescTextarea.value.length;
     }
     metaDescTextarea.addEventListener('input', updateMetaDescCount);
-    updateMetaDescCount();
+    updateMetaDescCount(); // Initial count
+}
+
+const metaTitleInput = document.getElementById('post_meta_title');
+const metaTitleCharCount = document.getElementById('meta_title_char_count');
+if(metaTitleInput && metaTitleCharCount) {
+    function updateMetaTitleCount() {
+        metaTitleCharCount.textContent = metaTitleInput.value.length;
+    }
+    metaTitleInput.addEventListener('input', updateMetaTitleCount);
+    updateMetaTitleCount(); // Initial count
 }
 
 if (typeof lucide !== 'undefined') { lucide.createIcons(); }

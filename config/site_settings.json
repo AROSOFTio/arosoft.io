@@ -1,7 +1,7 @@
 {
-    "site_name": "DIPUG",
-    "site_tagline": "Digital Innovation and Programing",
-    "contact_email": "info@dipug.com",
+    "site_name": "AROSOFT",
+    "site_tagline": "Innovating Future Technology",
+    "contact_email": "info@arosoft.io",
     "posts_per_page": 11,
-    "footer_copyright": "&copy; 2025 DIPUG. All Rights Reserved."
+    "footer_copyright": "&copy; {YEAR} AROSOFT Innovations. All Rights Reserved."
 }

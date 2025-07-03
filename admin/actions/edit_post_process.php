@@ -41,24 +41,8 @@ if (!defined('BASE_URL')) {
 }
 $admin_base_url = BASE_URL . 'admin/';
 
-// Debug request information
-error_log("\n=== Processing Post Edit Request ===");
-error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
-error_log("Submit Post Value: " . ($_POST['submit_post'] ?? 'not set'));
-error_log("Post ID: " . ($_POST['post_id'] ?? 'not set'));
-error_log("Form Action: " . $_SERVER['REQUEST_URI']);
-error_log("Full POST Data: " . print_r($_POST, true));
-error_log("Session User: " . (isset($_SESSION['admin_user_id']) ? $_SESSION['admin_user_id'] : 'not set'));
-error_log("=== End Request Info ===\n");
-
-// Store debug info in session for troubleshooting
-$_SESSION['last_form_debug'] = [
-    'request_method' => $_SERVER['REQUEST_METHOD'],
-    'submit_value' => $_POST['submit_post'] ?? 'not set',
-    'post_id' => $_POST['post_id'] ?? 'not set',
-    'form_action' => $_SERVER['REQUEST_URI'],
-    'timestamp' => date('Y-m-d H:i:s')
-];
+// Specific error logs for key validation points remain, but general request dump is removed.
+// error_log("Processing post ID: " . $post_id); // Example of a useful specific log
 
 $project_root = __DIR__ . '/../../'; 
 $upload_path = $project_root . 'uploads/'; 
@@ -144,10 +128,17 @@ $remove_featured_image = isset($_POST['remove_featured_image']) && $_POST['remov
 
 $meta_description = trim($_POST['post_meta_description'] ?? '');
 $meta_keywords = trim($_POST['post_meta_keywords'] ?? '');
+$meta_title = trim($_POST['post_meta_title'] ?? ''); // New field
+$opengraph_image_url = trim($_POST['post_opengraph_image_url'] ?? ''); // New field
 $excerpt = trim($_POST['post_excerpt'] ?? '');
     
 // Validate form data
 $errors = [];
+
+// Validate Open Graph Image URL
+if (!empty($opengraph_image_url) && !filter_var($opengraph_image_url, FILTER_VALIDATE_URL)) {
+    $errors[] = "Open Graph Image URL is not a valid URL.";
+}
 
 // Required fields validation
 if (empty($title)) {
@@ -237,8 +228,10 @@ if (empty($excerpt) && !empty($clean_content)) {
 // Prepare values for database
 $category_id_to_save = $category_id === 0 ? null : $category_id;
 $featured_image_to_save = $featured_image_filename;
+$meta_title_to_save = empty($meta_title) ? null : $meta_title; // New
 $meta_description_to_save = empty($meta_description) ? null : $meta_description;
 $meta_keywords_to_save = empty($meta_keywords) ? null : $meta_keywords;
+$opengraph_image_url_to_save = empty($opengraph_image_url) ? null : $opengraph_image_url; // New
 $excerpt_to_save = empty($excerpt) ? null : $excerpt;
 
 // Prepare update query
@@ -248,17 +241,19 @@ $sql = "UPDATE posts SET
     content = ?, 
     category_id = ?, 
     status = ?, 
-    featured_image = ?, 
+    featured_image = ?,
+    meta_title = ?,
     meta_description = ?, 
-    meta_keywords = ?, 
+    meta_keywords = ?,
+    opengraph_image_url = ?,
     excerpt = ?, 
     updated_at = NOW() 
-WHERE id = ?";
+WHERE id = ?"; // Added meta_title, opengraph_image_url
 
 // Execute update
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
-    error_log("DB Prepare Error: " . $conn->error);
+    error_log("DB Prepare Error: " . $conn->error . " SQL: " . $sql);
     $_SESSION['flash_message'] = "Database error: " . esc_html($conn->error);
     $_SESSION['flash_message_type'] = "error";
     $_SESSION['form_data'] = $_POST;
@@ -266,15 +261,17 @@ if (!$stmt) {
     exit;
 }
 
-$stmt->bind_param("sssisssssi",
+$stmt->bind_param("sssisssssssi", // Changed from sssisssssi
     $title, 
     $slug, 
     $clean_content, 
     $category_id_to_save, 
     $status_to_save,
-    $featured_image_to_save, 
+    $featured_image_to_save,
+    $meta_title_to_save,
     $meta_description_to_save, 
-    $meta_keywords_to_save, 
+    $meta_keywords_to_save,
+    $opengraph_image_url_to_save,
     $excerpt_to_save,
     $post_id
 );

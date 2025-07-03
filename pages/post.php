@@ -60,6 +60,22 @@ if (!empty($stmt)) {
         $result = $stmt->get_result();
         if ($result && $result->num_rows > 0) {
             $post_data = $result->fetch_assoc();
+
+            // Increment view count if it's a published post and not a preview
+            if (!$is_preview && isset($post_data['id']) && $post_data['status'] === 'published') {
+                $update_view_sql = "UPDATE posts SET view_count = view_count + 1 WHERE id = ?";
+                $stmt_view = $conn->prepare($update_view_sql);
+                if ($stmt_view) {
+                    $stmt_view->bind_param("i", $post_data['id']);
+                    if (!$stmt_view->execute()) {
+                        error_log("Error updating view count for post ID " . $post_data['id'] . ": " . $stmt_view->error);
+                    }
+                    $stmt_view->close();
+                } else {
+                    error_log("Error preparing view count update statement for post ID " . $post_data['id'] . ": " . $conn->error);
+                }
+            }
+
             $page_title = esc_html($post_data['title'])
                         . ($is_preview ? " (Preview)" : "")
                         . " - Blog | " . SITE_NAME;

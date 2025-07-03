@@ -1,5 +1,5 @@
 <?php
-// db.php - Database Connection Script for DIPUG
+// db.php - Database Connection Script for AROSOFT
 
 // Database connection constants
 defined('DB_HOST') or define('DB_HOST', 'localhost');

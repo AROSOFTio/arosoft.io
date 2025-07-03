@@ -30,7 +30,7 @@ if (!defined('BASE_URL')) {
     define('BASE_URL', $protocol . $domain . $base_path);
 }
 
-defined('SITE_NAME') or define('SITE_NAME', $site_settings['site_name'] ?? 'dipug.com');
+defined('SITE_NAME') or define('SITE_NAME', $site_settings['site_name'] ?? 'AROSOFT');
 
 // Debug URL construction
 error_log("BASE_URL in admin/index.php: " . BASE_URL);
@@ -38,8 +38,8 @@ error_log("Request URI: " . $_SERVER['REQUEST_URI']);
 error_log("HTTP_HOST: " . $_SERVER['HTTP_HOST']);
 defined('SITE_TAGLINE') or define('SITE_TAGLINE', $site_settings['site_tagline'] ?? 'Digital Innovation and Programing');
 defined('POSTS_PER_PAGE') or define('POSTS_PER_PAGE', (int)($site_settings['posts_per_page'] ?? 10));
-defined('CONTACT_EMAIL') or define('CONTACT_EMAIL', $site_settings['contact_email'] ?? 'info@example.com');
-defined('FOOTER_COPYRIGHT') or define('FOOTER_COPYRIGHT', $site_settings['footer_copyright'] ?? '&copy; {year} dipug.com. All Rights Reserved.');
+defined('CONTACT_EMAIL') or define('CONTACT_EMAIL', $site_settings['contact_email'] ?? 'info@arosoft.io');
+defined('FOOTER_COPYRIGHT') or define('FOOTER_COPYRIGHT', $site_settings['footer_copyright'] ?? '&copy; {year} AROSOFT Innovations. All Rights Reserved.');
 
 
 $admin_base_url = rtrim(BASE_URL, '/') . '/admin/'; // Ensure trailing slash for admin base

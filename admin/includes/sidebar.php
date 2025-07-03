@@ -2,7 +2,7 @@
 $active_admin_page = $admin_page ?? ($_GET['admin_page'] ?? 'dashboard');
 
 defined('BASE_URL') or define('BASE_URL', '/');
-defined('SITE_NAME') or define('SITE_NAME', 'dipug.com');
+defined('SITE_NAME') or define('SITE_NAME', 'AROSOFT');
 
 $admin_base_url = BASE_URL . 'admin/';
 

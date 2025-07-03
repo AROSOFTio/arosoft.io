@@ -9,12 +9,12 @@ $settings_file_path = __DIR__ . '/../../config/site_settings.json'; // Relative 
 
 // Default settings
 $default_settings = [
-    'site_name' => defined('SITE_NAME') ? SITE_NAME : 'dipug.com',
-    'site_tagline' => defined('SITE_TAGLINE') ? SITE_TAGLINE : 'Digital Innovation and Programing',
+    'site_name' => defined('SITE_NAME') ? SITE_NAME : 'AROSOFT',
+    'site_tagline' => defined('SITE_TAGLINE') ? SITE_TAGLINE : 'Innovating Future Technology',
     'site_description' => '', // New default
     'posts_per_page' => 10,
-    'contact_email' => 'info@dipug.com',
-    'footer_copyright' => '&copy; ' . date("Y") . ' ' . (defined('SITE_NAME') ? SITE_NAME : 'dipug.com') . '. All Rights Reserved.',
+    'contact_email' => 'info@arosoft.io',
+    'footer_copyright' => '&copy; ' . date("Y") . ' ' . (defined('SITE_NAME') ? SITE_NAME : 'AROSOFT') . ' Innovations. All Rights Reserved.',
     'site_logo' => null,
     'seo_site_title' => '', // New SEO default
     'seo_default_description' => '', // New SEO default
