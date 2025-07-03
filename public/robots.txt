@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: <?php echo rtrim(BASE_URL, '/'); ?>/sitemap.xml

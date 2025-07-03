@@ -1,0 +1,224 @@
+:root {
+  /* Primary Palette */
+  --primary:       #0056B3; /* Main blue */
+  --primary-hover: #004A99;
+
+  /* Accent / Highlight */
+  --accent:        #4B5563; /* Slate accent */
+  --accent-hover:  #374151;
+  --highlight:     #F59E0B; /* Amber highlight */
+  --highlight-hover: #D97706;
+
+  /* Backgrounds */
+  --background:    #F4F4F4; /* Light gray (page background) */
+  --base-100:      #FFFFFF;
+  --base-200:      #F4F4F4;
+  --base-300:      #E5E7EB;
+
+  /* Text */
+  --text-main:     #333333; /* Dark gray for primary body text */
+  --text-light:    #F1F5F9; /* Off-white for dark backgrounds */
+
+  /* Neutrals for cards, nav */
+  --neutral:         #F4F4F4;
+  --neutral-content: #333333;
+  --neutral-focus:   #0056B3;
+  --neutral-light:   #E5E7EB;
+  --neutral-lighter: #F9FAFB;
+
+  /* State Colors */
+  --info:    #22D3EE;
+  --success: #34D399;
+  --warning: #F59E0B;
+  --error:   #F87171;
+}
+
+/* -------------------------------------------------------------------------
+   Base Reset
+   ------------------------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-main);
+  background-color: var(--background);
+}
+
+/* -------------------------------------------------------------------------
+   Navigation Bar
+   ------------------------------------------------------------------------- */
+nav {
+  background: var(--base-100);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav a {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 1.5rem;
+}
+
+nav a:hover {
+  color: var(--primary);
+}
+
+.nav-link-active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+   Hero Section
+   ------------------------------------------------------------------------- */
+.hero {
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 86, 179, 0.9),
+    rgba(75, 85, 99, 0.8)
+  );
+  color: var(--text-light);
+  padding: 80px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--text-light);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.hero h1 .accent {
+  color: var(--accent);
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  opacity: 0.85;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.hero .btn-primary {
+  background-color: var(--accent);
+  color: var(--text-light);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  margin: 10px;
+}
+.hero .btn-primary:hover {
+  background-color: var(--highlight-hover);
+}
+
+.hero .btn-secondary {
+  background-color: var(--base-100);
+  color: var(--text-main);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  margin: 10px;
+}
+.hero .btn-secondary:hover {
+  background-color: var(--neutral-light);
+}
+
+/* -------------------------------------------------------------------------
+   Section Titles
+   ------------------------------------------------------------------------- */
+.section-title {
+  font-size: 2rem;
+  color: var(--text-main);
+  text-align: center;
+  margin: 60px 0 20px;
+}
+
+/* -------------------------------------------------------------------------
+   Core Services
+   ------------------------------------------------------------------------- */
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 40px 20px;
+  background-color: var(--neutral);
+}
+
+.service-card {
+  background: var(--base-100);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+  max-width: 300px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.service-card h3 {
+  color: var(--accent);
+  margin-bottom: 15px;
+}
+.service-card p {
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------------------- */
+footer {
+  text-align: center;
+  padding: 40px;
+  background: var(--primary);
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+footer a {
+  color: var(--highlight);
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+footer a:hover {
+  color: var(--text-light);
+}
+
+/* -------------------------------------------------------------------------
+   Utility Classes
+   ------------------------------------------------------------------------- */
+.text-primary        { color: var(--primary)       !important; }
+.text-primary-hover:hover { color: var(--primary-hover) !important; }
+.text-secondary      { color: var(--secondary)     !important; }
+.text-secondary-hover:hover { color: var(--secondary-hover) !important; }
+.text-accent         { color: var(--accent)        !important; }
+.text-accent-hover:hover  { color: var(--accent-hover)!important; }
+.bg-primary          { background-color: var(--primary) !important; }
+.bg-secondary        { background-color: var(--secondary) !important; }
+.bg-accent           { background-color: var(--accent) !important; }
+.hover\:bg-primary:hover    { background-color: var(--primary-hover) !important; }
+.hover\:bg-secondary:hover  { background-color: var(--secondary-hover) !important; }
+.hover\:bg-accent:hover     { background-color: var(--accent-hover) !important; }

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Disallow access to the admin area
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /actions/
+Disallow: /config/
+Disallow: /libs/
+Disallow: /reviews/
+
+Sitemap: <?php echo rtrim(BASE_URL, '/'); ?>/sitemap.xml
