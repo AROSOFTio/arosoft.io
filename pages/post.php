@@ -8,7 +8,7 @@ global $site_settings;
 
 $post_data = null;
 $is_preview = false;
-$base_blog_url_for_return = rtrim(BASE_URL, '/') . '/blog';
+$base_blog_url_for_return = BASE_URL . 'index.php?page=blog'; // Changed to index.php?page= format
 
 if (isset($_GET['preview_id'], $_GET['token']) && isset($_SESSION['admin_user_id'])) {
     $preview_post_id = (int)$_GET['preview_id'];
@@ -135,7 +135,8 @@ if ($post_data && !empty($post_data['slug'])) {
       <article class="bg-base-100 p-6 sm:p-8 md:p-10 rounded-xl shadow-2xl">
         <header class="mb-8 pb-6 border-b border-base-200">
           <?php if (!empty($post_data['category_name']) && !empty($post_data['category_slug'])):
-            $category_url = rtrim(BASE_URL, '/') . '/blog/category/' . esc_html($post_data['category_slug']);
+            // Assuming blog.php handles a 'category' GET parameter for filtering
+            $category_url = BASE_URL . 'index.php?page=blog&category=' . esc_html($post_data['category_slug']);
           ?>
             <a href="<?= $category_url; ?>"
                class="text-sm font-semibold uppercase tracking-wider text-secondary hover:text-highlight transition-colors"

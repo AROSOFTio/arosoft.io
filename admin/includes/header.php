@@ -116,7 +116,7 @@ $admin_base_url = BASE_URL . 'admin/';
                                 <span class="text-gray-300">|</span>
                             </div>
                             
-                            <a href="<?php echo BASE_URL; ?>" target="_blank" class="btn-hover-effect text-sm text-admin-secondary hover:text-admin-secondary/80 flex items-center px-3 py-2 rounded-md">
+                            <a href="<?php echo BASE_URL; ?>index.php?page=home" target="_blank" class="btn-hover-effect text-sm text-admin-secondary hover:text-admin-secondary/80 flex items-center px-3 py-2 rounded-md">
                                 <i data-lucide="external-link" class="w-4 h-4 mr-1.5"></i>
                                 <span>View Site</span>
                             </a>

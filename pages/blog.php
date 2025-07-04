@@ -116,7 +116,8 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
     <!-- Filter Section -->
     <div class="mb-10 p-6 bg-base-100 rounded-lg shadow-md">
       <h3 class="text-xl font-semibold text-text mb-4">Filter Posts</h3>
-      <form method="GET" action="<?= rtrim(BASE_URL, '/'); ?>/blog" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
+      <form method="GET" action="<?= BASE_URL; ?>index.php?page=blog" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
+        <input type="hidden" name="page" value="blog"> <!-- Keep page parameter for form submission -->
         <div>
           <label for="search" class="block text-sm font-medium text-text/70 mb-1">Search</label>
           <input
@@ -154,7 +155,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
           </button>
           <?php if ($search_term || $category_filter_slug): ?>
             <a
-              href="<?= rtrim(BASE_URL, '/'); ?>/blog"
+              href="<?= BASE_URL; ?>index.php?page=blog"
               class="block mt-2 sm:mt-0 sm:ml-2 text-xs text-text/70 hover:text-secondary underline"
             >Clear Filters</a>
           <?php endif; ?>
@@ -169,7 +170,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
             class="bg-base-100 rounded-xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-secondary/20 hover:-translate-y-1 animate-fade-in-up"
             style="animation-delay: <?= $idx * 100; ?>ms"
           >
-            <?php $post_url = rtrim(BASE_URL, '/') . '/' . esc_html($post['slug']); ?>
+            <?php $post_url = BASE_URL . 'index.php?page=post&slug=' . esc_html($post['slug']); ?>
             <?php if (!empty($post['featured_image'])): ?>
               <a href="<?= $post_url; ?>">
                 <img
@@ -188,7 +189,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
             <div class="p-6 flex flex-col flex-grow">
               <div class="mb-3 flex items-center space-x-2">
                 <?php if (!empty($post['category_name'])):
-                  $category_url = rtrim(BASE_URL, '/') . '/blog/category/' . esc_html($post['category_slug']);
+                  $category_url = BASE_URL . 'index.php?page=blog&category=' . esc_html($post['category_slug']);
                 ?>
                   <a
                     href="<?= $category_url; ?>"
@@ -220,16 +221,28 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
       </div>
 
       <?php if ($total_pages > 1):
-        $base_url = rtrim(BASE_URL, '/') . '/blog';
+        // Construct the base link for pagination using index.php?page= format
+        $pagination_params = ['page' => 'blog'];
         if ($category_filter_slug) {
-          $base_url .= '/category/' . urlencode($category_filter_slug);
+            $pagination_params['category'] = $category_filter_slug;
         }
-        $search_query = $search_term ? '?search=' . urlencode($search_term) : '';
+        if ($search_term) {
+            $pagination_params['search'] = $search_term;
+        }
+
+        // Function to generate pagination link
+        function generate_blog_pagination_link($page_num, $base_params) {
+            $current_params = $base_params;
+            if ($page_num > 1) {
+                $current_params['paged'] = $page_num;
+            }
+            return BASE_URL . 'index.php?' . http_build_query($current_params);
+        }
       ?>
         <nav class="mt-12 md:mt-16 pt-8 border-t border-neutral-light flex justify-center items-center space-x-1 sm:space-x-2" aria-label="Pagination">
           <?php if ($current_page_number > 1): ?>
             <a
-              href="<?= $base_url . '/page/' . ($current_page_number - 1) . $search_query; ?>"
+              href="<?= generate_blog_pagination_link($current_page_number - 1, $pagination_params); ?>"
               class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors flex items-center"
             ><i data-lucide="chevron-left" class="w-4 h-4 sm:mr-1"></i><span class="hidden sm:inline">Previous</span></a>
           <?php endif; ?>
@@ -243,7 +256,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
             }
 
             if ($start > 1) {
-              echo '<a href="'.$base_url.'/page/1'.$search_query.'" class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors">1</a>';
+              echo '<a href="'.generate_blog_pagination_link(1, $pagination_params).'" class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors">1</a>';
               if ($start > 2) {
                 echo '<span class="px-3 py-2 sm:px-4 text-sm text-text/60">...</span>';
               }
@@ -255,7 +268,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
               <span aria-current="page" class="px-3 py-2 sm:px-4 text-sm font-semibold text-white bg-secondary rounded-md"><?= $i; ?></span>
             <?php else: ?>
               <a
-                href="<?= $base_url . '/page/' . $i . $search_query; ?>"
+                href="<?= generate_blog_pagination_link($i, $pagination_params); ?>"
                 class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors"
               ><?= $i; ?></a>
             <?php endif; ?>
@@ -265,13 +278,13 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
               if ($end < $total_pages - 1) {
                 echo '<span class="px-3 py-2 sm:px-4 text-sm text-text/60">...</span>';
               }
-              echo '<a href="'.$base_url.'/page/'.$total_pages.$search_query.'" class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors">'.$total_pages.'</a>';
+              echo '<a href="'.generate_blog_pagination_link($total_pages, $pagination_params).'" class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors">'.$total_pages.'</a>';
             }
           ?>
 
           <?php if ($current_page_number < $total_pages): ?>
             <a
-              href="<?= $base_url . '/page/' . ($current_page_number + 1) . $search_query; ?>"
+              href="<?= generate_blog_pagination_link($current_page_number + 1, $pagination_params); ?>"
               class="px-3 py-2 sm:px-4 text-sm text-text/80 bg-base-200 hover:bg-secondary hover:text-white rounded-md transition-colors flex items-center"
             ><span class="hidden sm:inline">Next</span> <i data-lucide="chevron-right" class="w-4 h-4 sm:ml-1"></i></a>
           <?php endif; ?>
@@ -285,7 +298,7 @@ $all_categories        = ($all_categories_result && $all_categories_result->num_
         <p class="text-text/60">It seems there are no blog posts matching your criteria. Try adjusting your filters or check back later!</p>
         <?php if ($search_term || $category_filter_slug): ?>
           <a
-            href="<?= rtrim(BASE_URL, '/'); ?>/blog"
+            href="<?= BASE_URL; ?>index.php?page=blog"
             class="mt-6 inline-flex items-center px-5 py-3 bg-secondary hover:bg-secondary-hover text-white font-medium rounded-lg shadow transition-colors"
           >Clear Filters and Show All Posts</a>
         <?php endif; ?>

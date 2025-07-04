@@ -21,26 +21,26 @@
                 <div>
                     <h5 class="text-base font-semibold text-text mb-4">Quick Links</h5>
                     <ul class="space-y-2 text-sm text-neutral-content">
-                        <li><a href="<?= rtrim(BASE_URL, '/'); ?>/" class="hover:text-secondary transition-colors">Home</a></li>
-                        <li><a href="<?= BASE_URL; ?>about" class="hover:text-secondary transition-colors">About Us</a></li>
-                        <li><a href="<?= BASE_URL; ?>services_overview" class="hover:text-secondary transition-colors">Services</a></li>
-                        <li><a href="<?= BASE_URL; ?>blog" class="hover:text-secondary transition-colors">Blog</a></li>
-                        <li><a href="<?= BASE_URL; ?>contact" class="hover:text-secondary transition-colors">Contact Us</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=home" class="hover:text-secondary transition-colors">Home</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=about" class="hover:text-secondary transition-colors">About Us</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=services_overview" class="hover:text-secondary transition-colors">Services</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=blog" class="hover:text-secondary transition-colors">Blog</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=contact" class="hover:text-secondary transition-colors">Contact Us</a></li>
                     </ul>
                 </div>
                 <div>
                     <h5 class="text-base font-semibold text-text mb-4">Our Services</h5>
                     <ul class="space-y-2 text-sm text-neutral-content">
-                        <li><a href="<?= BASE_URL; ?>webDev" class="hover:text-secondary transition-colors">Web Development</a></li>
-                        <li><a href="<?= BASE_URL; ?>software" class="hover:text-secondary transition-colors">Software Solutions</a></li>
-                        <li><a href="<?= BASE_URL; ?>cloud" class="hover:text-secondary transition-colors">Cloud &amp; DevOps</a></li>
-                        <li><a href="<?= BASE_URL; ?>cybersecurity" class="hover:text-secondary transition-colors">Cybersecurity</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=webDev" class="hover:text-secondary transition-colors">Web Development</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=software" class="hover:text-secondary transition-colors">Software Solutions</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=cloud" class="hover:text-secondary transition-colors">Cloud &amp; DevOps</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=cybersecurity" class="hover:text-secondary transition-colors">Cybersecurity</a></li>
                     </ul>
                 </div>
                 <div>
                     <h5 class="text-base font-semibold text-text mb-4">Legal</h5>
                     <ul class="space-y-2 text-sm text-neutral-content">
-                        <li><a href="<?= BASE_URL; ?>privacy" class="hover:text-secondary transition-colors">Privacy Policy</a></li>
+                        <li><a href="<?= BASE_URL; ?>index.php?page=privacy" class="hover:text-secondary transition-colors">Privacy Policy</a></li>
                         <li><a href="#" class="hover:text-secondary transition-colors">Terms of Service</a></li>
                     </ul>
                 </div>
