@@ -18,18 +18,54 @@ $purifier = null;
 if (file_exists($htmlPurifierPath)) {
     require_once $htmlPurifierPath;
     $purifier_config = HTMLPurifier_Config::createDefault();
-    $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional');
+
+    // Enable HTML5 features
+    $purifier_config->set('HTML.DefinitionID', 'html5-definitions');
+    $purifier_config->set('HTML.DefinitionRev', 1);
+    // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional'); // HTML5 definition handles this better
+
+    // Allow proper HTML5 doctype if needed, or let HTMLPurifier handle it with its own mechanisms.
+    // For broader compatibility with HTML5, ensuring the lexer supports it is key.
+    // $purifier_config->set('Core.LexerImpl', 'DirectLex'); // Might be needed for full HTML5 parsing if default isn't sufficient
+
+    if ($def = $purifier_config->maybeGetRawHTMLDefinition()) {
+        // Add figure and figcaption
+        $figure_def = $def->addElement('figure', 'Block', 'Flow', 'Common');
+        $figure_def->excludes = array('figure' => true); // Figure cannot contain another figure directly
+
+        $def->addElement('figcaption', 'Block', 'Flow', 'Common', 'figure'); // Define figcaption as child of figure
+        // Add other HTML5 elements if TinyMCE outputs them, e.g., article, section, time
+    }
+
     $purifier_config->set('HTML.AllowedElements', [
         'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'span',
         'ul', 'ol', 'li',
         'a[href|title|target]',
-        'img[src|alt|title|width|height|style]', // Consider if img should be allowed from editor
+        'img[src|alt|title|width|height|style]',
         'h2', 'h3', 'h4', 'h5', 'h6',
-        'blockquote', 'pre', 'code', 'figure', 'figcaption' // Added figure/figcaption
+        'blockquote', 'pre', 'code',
+        'figure', 'figcaption' // Ensure they are listed here too
     ]);
+
+    // Whitelist CSS properties if 'style' attribute is allowed (e.g. for images)
+    $purifier_config->set('CSS.AllowedProperties', [
+        'text-align', 'float', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
+        'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom',
+        'width', 'height', 'border', 'border-collapse', 'border-spacing', 'list-style-type',
+        'color', 'background-color', 'font-weight', 'font-style', 'text-decoration',
+        'display' // Allow display for things like inline-block, block, none
+    ]);
+
     $purifier_config->set('HTML.TargetBlank', true); // Open external links in new tab
     $purifier_config->set('AutoFormat.AutoParagraph', true);
     $purifier_config->set('AutoFormat.RemoveEmpty', true); // Removes empty paragraphs
+
+    // Allow 'data' URI scheme for pasted images (TinyMCE's paste_data_images: true)
+    $purifier_config->set('URI.AllowedSchemes', [
+        'http' => true, 'https' => true, 'mailto' => true, 'ftp' => true,
+        'nntp' => true, 'news' => true, 'data' => true
+    ]);
+
     $purifier = new HTMLPurifier($purifier_config);
 } else {
      error_log("CRITICAL: HTMLPurifier library not found at: " . $htmlPurifierPath . ". Content will not be purified.");
