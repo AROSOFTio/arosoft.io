@@ -21,11 +21,11 @@ if (file_exists($htmlPurifierPath)) {
     $purifier_config->set('HTML.AllowedElements', [
         'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'span',
         'ul', 'ol', 'li',
-        'a[href|title|target]', // Keep as is
+        'a', // Simplified
         'img', // Simplified
         'h2', 'h3', 'h4', 'h5', 'h6',
         'blockquote', 'pre', 'code',
-        'figure', 'figcaption',
+        // 'figure', 'figcaption', // Removed: Rely on addElement below
         'iframe' // Simplified
     ]);
     $purifier_config->set('CSS.AllowedProperties', [
@@ -42,25 +42,32 @@ if (file_exists($htmlPurifierPath)) {
         'http' => true, 'https' => true, 'mailto' => true, 'ftp' => true,
         'nntp' => true, 'news' => true, 'data' => true
     ]);
-    // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional'); // Keep commented
+    // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional');
 
     // Now, handle HTML5 definition extensions
     $purifier_config->set('HTML.DefinitionID', 'arosoft-html5-definitions');
-    $purifier_config->set('HTML.DefinitionRev', 3); // Incremented
+    $purifier_config->set('HTML.DefinitionRev', 4); // Incremented
 
     if ($def = $purifier_config->maybeGetRawHTMLDefinition()) {
-        // Add figure element if not already defined
+        // Define figure element
         if (empty($def->info['figure'])) {
             $figure_el = $def->addElement('figure', 'Block', 'Flow', 'Common');
             $figure_el->excludes = array('figure' => true);
         }
 
-        // Add figcaption element if not already defined
+        // Define figcaption element
         if (empty($def->info['figcaption'])) {
             $def->addElement('figcaption', 'Block', 'Flow', 'Common', 'figure');
         }
 
-        // Programmatically add attributes for img
+        // Programmatically add attributes for 'a'
+        if (!empty($def->info['a'])) {
+            $def->addAttribute('a', 'href', 'URI');
+            $def->addAttribute('a', 'title', 'Text');
+            $def->addAttribute('a', 'target', 'Enum#_blank,_self,_parent,_top');
+        }
+
+        // Programmatically add attributes for 'img'
         if (!empty($def->info['img'])) {
             $def->addAttribute('img', 'src', 'URI');
             $def->addAttribute('img', 'alt', 'Text');
@@ -70,7 +77,9 @@ if (file_exists($htmlPurifierPath)) {
             $def->addAttribute('img', 'style', 'CSS');
         }
 
-        // Programmatically add attributes for iframe
+        // Programmatically add attributes for 'iframe'
+        // Temporarily commenting out all iframe attributes for diagnostics
+        /*
         if (!empty($def->info['iframe'])) {
             $def->addAttribute('iframe', 'src', 'URI#embedded');
             $def->addAttribute('iframe', 'width', 'Length');
@@ -86,6 +95,7 @@ if (file_exists($htmlPurifierPath)) {
             $def->addAttribute('iframe', 'class', 'Text');
             $def->addAttribute('iframe', 'loading', 'Enum#lazy,eager');
         }
+        */
     }
 
     $purifier = new HTMLPurifier($purifier_config);
