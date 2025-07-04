@@ -368,63 +368,62 @@ function slugify(text) {
         .replace(/-+$/, '');
 }
 
-// Enhanced TinyMCE Configuration
+// Updated TinyMCE Configuration
 if (typeof tinymce !== 'undefined') {
-    tinymce.init({
-        selector: '#post_content_editor',
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'autoresize',
-            'paste', 'emoticons', 'codesample'
-        ],
-        toolbar: [
-            'undo redo | formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify',
-            'bullist numlist | outdent indent | link image media | forecolor backcolor emoticons | code preview fullscreen',
-            'table | hr removeformat | subscript superscript | charmap | codesample'
-        ],
-        menubar: 'file edit view insert format tools table help',
-        toolbar_mode: 'sliding',
-        contextmenu: 'link image table',
-        content_style: `
-            body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-                font-size: 16px;
-                line-height: 1.6;
-                color: #1f2937;
-                margin: 1rem;
-            }
-            p { margin: 0 0 1em; }
-            table { border-collapse: collapse; }
-            table td, table th { border: 1px solid #e5e7eb; padding: 0.5rem; }
-        `,
-        height: 600,
-        min_height: 400,
-        max_height: 800,
-        autoresize_bottom_margin: 50,
-        relative_urls: false,
-        remove_script_host: false,
-        convert_urls: true,
-        browser_spellcheck: true,
-        paste_data_images: true,
-        image_advtab: true,
-        link_context_toolbar: true,
-        setup: function (editor) {
-            let timer;
-            editor.on('change keyup', function() {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
-                    editor.save();
-                    console.log('Content auto-saved locally');
-                }, 3000);
-            });
-            window.onbeforeunload = function() {
-                if (editor.isDirty()) {
-                    return 'You have unsaved changes. Do you really want to leave?';
-                }
-            };
+  tinymce.init({
+    selector: '#post_content_editor', // Using specific ID selector from previous config
+    plugins: [
+      // Core editing features
+      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+      // Your account includes a free trial of TinyMCE premium features
+      // Try the most popular premium features until Jul 18, 2025:
+      'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+    ],
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name', // You might want to make this dynamic e.g., current user
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+    // Adding some useful options from previous config, if not overridden by new one
+    height: 600,
+    min_height: 400,
+    image_advtab: true, // Retain advanced image tab
+    paste_data_images: true, // Retain pasting images as data
+    relative_urls: false,
+    remove_script_host: false,
+    convert_urls: true,
+    browser_spellcheck: true,
+    content_style: `
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1f2937;
+            margin: 1rem;
         }
-    });
+        p { margin: 0 0 1em; }
+        table { border-collapse: collapse; }
+        table td, table th { border: 1px solid #e5e7eb; padding: 0.5rem; }
+    `,
+    setup: function (editor) { // Retaining existing setup function for autosave etc.
+        let timer;
+        editor.on('change keyup', function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                editor.save();
+                console.log('Content auto-saved locally');
+            }, 3000);
+        });
+        window.onbeforeunload = function() {
+            if (editor.isDirty()) {
+                return 'You have unsaved changes. Do you really want to leave?';
+            }
+        };
+    }
+  });
 } else {
     console.warn("TinyMCE script not loaded. Rich text editor will not be available.");
 }

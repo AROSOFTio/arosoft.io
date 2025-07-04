@@ -44,10 +44,11 @@ if (file_exists($htmlPurifierPath)) {
         'img[src|alt|title|width|height|style]',
         'h2', 'h3', 'h4', 'h5', 'h6',
         'blockquote', 'pre', 'code',
-        'figure', 'figcaption' // Ensure they are listed here too
+        'figure', 'figcaption', // Ensure they are listed here too
+        'iframe[src|width|height|frameborder|allow|allowfullscreen|style|scrolling|title|name|id|class|loading]' // Added iframe for media embeds
     ]);
 
-    // Whitelist CSS properties if 'style' attribute is allowed (e.g. for images)
+    // Whitelist CSS properties if 'style' attribute is allowed (e.g. for images, iframes)
     $purifier_config->set('CSS.AllowedProperties', [
         'text-align', 'float', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
         'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom',

@@ -46,7 +46,7 @@ $admin_base_url = BASE_URL . 'admin/';
     
     <?php if ($current_admin_page_for_header === 'add_post' || $current_admin_page_for_header === 'edit_post'): ?>
     <!-- TinyMCE with WordPress-like configuration -->
-    <script src="https://cdn.tiny.cloud/1/8p9b08ie4vj71jyp1rcn5fubk9tukzougnjrla69sgyox9z0/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/5ppeckamfhsj57zifjdngxrca2zik0bwx6grbzf6whjn269e/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <?php endif; ?>
 
     <link rel="icon" href="<?php echo BASE_URL; ?>assets/favicon.ico" type="image/x-icon">
