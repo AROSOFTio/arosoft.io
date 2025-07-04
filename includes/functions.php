@@ -55,6 +55,30 @@ function esc_url(string $string): string {
 }
 
 /**
+ * Escape a string for use in JavaScript.
+ * Adds slashes before characters that need to be escaped.
+ *
+ * @param string|null $text The string to escape.
+ * @return string The escaped string.
+ */
+function esc_js(?string $text): string {
+    if ($text === null) {
+        return '';
+    }
+    $text = str_replace('\\', '\\\\', $text); // Must be first
+    $text = str_replace('\'', '\\\'', $text);
+    $text = str_replace('"', '\\"', $text);
+    $text = str_replace("\n", '\\n', $text);
+    $text = str_replace("\r", '\\r', $text);
+    $text = str_replace("\t", '\\t', $text);
+    $text = str_replace('<', '\\u003C', $text); // For script tags
+    $text = str_replace('>', '\\u003E', $text);
+    // Optionally, handle other characters like &
+    // $text = str_replace('&', '\\u0026', $text);
+    return $text;
+}
+
+/**
  * Convert text to a URL-friendly slug.
  *
  * @param string $text
@@ -168,6 +192,25 @@ function validate_csrf_token(string $token): bool {
     }
 
     return false;
+}
+
+/**
+ * Outputs 'selected' if the current value matches the option value.
+ * Useful for select dropdowns.
+ *
+ * @param mixed $current_value The current selected value.
+ * @param mixed $option_value The value of the option being checked.
+ * @param bool $is_multiple Whether the select is a multiple select.
+ * @return void Echos 'selected' or an empty string.
+ */
+function selected($current_value, $option_value, bool $is_multiple = false): void {
+    if ($is_multiple) {
+        if (is_array($current_value) && in_array($option_value, $current_value, true)) {
+            echo ' selected';
+        }
+    } elseif ((string)$current_value === (string)$option_value) {
+        echo ' selected';
+    }
 }
 
 /**

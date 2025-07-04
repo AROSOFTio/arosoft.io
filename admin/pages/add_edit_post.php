@@ -59,6 +59,7 @@ $post_meta_keywords = '';
 $post_meta_title = ''; // New
 $post_opengraph_image_url = ''; // New
 $post_excerpt = '';
+$post_author_id = null; // For storing/selecting author
 
 $is_editing = isset($_GET['id']) && !empty($_GET['id']);
 $post_id = $is_editing ? (int)$_GET['id'] : null;
@@ -73,14 +74,15 @@ if ($is_editing && $post_id <= 0) {
 $form_action_target = $is_editing ? 'edit_post_process.php' : 'add_post_process.php';
 
 if ($is_editing) {
-    // Added meta_title, opengraph_image_url to SELECT
-    $stmt = $conn->prepare("SELECT title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt FROM posts WHERE id = ?");
+    // Added author_id, meta_title, opengraph_image_url to SELECT
+    $stmt = $conn->prepare("SELECT author_id, title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt FROM posts WHERE id = ?");
     if ($stmt) {
         $stmt->bind_param("i", $post_id);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 1) {
             $post = $result->fetch_assoc();
+            $post_author_id = $post['author_id'];
             $post_title = $post['title'];
             $post_slug = $post['slug'];
             $post_content = $post['content'];
@@ -115,12 +117,23 @@ $all_categories_result = $conn->query($all_categories_sql);
 $all_categories_flat = ($all_categories_result && $all_categories_result->num_rows > 0) ? $all_categories_result->fetch_all(MYSQLI_ASSOC) : [];
 $category_tree_for_select = build_category_tree($all_categories_flat);
 
+// Fetch authors for dropdown
+$authors_sql = "SELECT id, username, full_name FROM admin_users ORDER BY username ASC";
+$authors_result = $conn->query($authors_sql);
+$authors_for_select = ($authors_result && $authors_result->num_rows > 0) ? $authors_result->fetch_all(MYSQLI_ASSOC) : [];
+
 
 $form_data = $_SESSION['form_data'] ?? []; // For repopulating form after error
 unset($_SESSION['form_data']);
 
 // Determine current category ID for post form (from form_data if exists, else from DB or null)
 $current_post_category_id_for_form = $form_data['post_category_id'] ?? $post_category_id;
+// Determine current author ID for post form
+$current_post_author_id_for_form = $form_data['post_author_id'] ?? $post_author_id;
+// If creating a new post and no author ID is set yet, default to current logged-in user
+if (!$is_editing && empty($current_post_author_id_for_form) && isset($_SESSION['admin_user_id'])) {
+    $current_post_author_id_for_form = $_SESSION['admin_user_id'];
+}
 
 
 $preview_link = null;
@@ -236,6 +249,25 @@ if ($is_editing && $post_status === 'published' && !empty($post_slug)) {
                             ?>
                         </select>
                          <p class="text-xs text-gray-500 mt-1">Manage categories <a href="<?php echo $admin_base_url; ?>index.php?admin_page=categories" class="text-admin-primary hover:underline">here</a>.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-md shadow-sm border">
+                    <h3 class="text-lg font-medium text-gray-900 mb-3 border-b pb-2">Author</h3>
+                    <div>
+                        <label for="post_author_id" class="sr-only">Author</label>
+                        <select name="post_author_id" id="post_author_id" required class="mt-1 block w-full px-3 py-2.5 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-admin-primary focus:border-admin-primary sm:text-sm">
+                            <option value="">-- Select Author --</option>
+                            <?php foreach ($authors_for_select as $author_user): ?>
+                                <option value="<?php echo (int)$author_user['id']; ?>" <?php selected($current_post_author_id_for_form, (int)$author_user['id']); ?>>
+                                    <?php echo esc_html($author_user['full_name'] ?: $author_user['username']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if (empty($authors_for_select)): ?>
+                            <p class="text-xs text-red-500 mt-1">No authors found. Please <a href="<?php echo $admin_base_url; ?>index.php?admin_page=add_user" class="text-admin-primary hover:underline">add an admin user</a>.</p>
+                        <?php endif; ?>
+                         <p class="text-xs text-gray-500 mt-1">Manage users <a href="<?php echo $admin_base_url; ?>index.php?admin_page=users" class="text-admin-primary hover:underline">here</a>.</p>
                     </div>
                 </div>
 

@@ -87,9 +87,29 @@ $meta_keywords = trim($_POST['post_meta_keywords'] ?? '');
 $meta_title = trim($_POST['post_meta_title'] ?? ''); // New field
 $opengraph_image_url = trim($_POST['post_opengraph_image_url'] ?? ''); // New field
 $excerpt = trim($_POST['post_excerpt'] ?? '');
-$user_id = $_SESSION['admin_user_id']; // Author ID
+// $user_id = $_SESSION['admin_user_id']; // Old way, now from dropdown
+$post_author_id_input = $_POST['post_author_id'] ?? null;
 
 $errors = [];
+
+// Validate author ID
+if (empty($post_author_id_input) || !filter_var($post_author_id_input, FILTER_VALIDATE_INT) || (int)$post_author_id_input <= 0) {
+    $errors[] = "A valid author must be selected.";
+} else {
+    // Check if author exists
+    $author_check_stmt = $conn->prepare("SELECT id FROM admin_users WHERE id = ?");
+    if ($author_check_stmt) {
+        $author_check_stmt->bind_param("i", $post_author_id_input);
+        $author_check_stmt->execute();
+        $author_check_stmt->store_result();
+        if ($author_check_stmt->num_rows == 0) {
+            $errors[] = "Selected author is invalid.";
+        }
+        $author_check_stmt->close();
+    } else {
+        $errors[] = "Database error validating author.";
+    }
+}
 
 // Validate Open Graph Image URL
 if (!empty($opengraph_image_url) && !filter_var($opengraph_image_url, FILTER_VALIDATE_URL)) {
@@ -185,25 +205,26 @@ $meta_description_to_save = empty($meta_description) ? null : $meta_description;
 $meta_keywords_to_save = empty($meta_keywords) ? null : $meta_keywords;
 $opengraph_image_url_to_save = empty($opengraph_image_url) ? null : $opengraph_image_url; // New
 $excerpt_to_save = empty($excerpt) ? null : $excerpt;
+$author_id_to_save = (int)$post_author_id_input; // Already validated as int > 0
 
 
-$sql = "INSERT INTO posts (user_id, title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt, view_count, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())"; // Added meta_title, opengraph_image_url, view_count (default 0)
+$sql = "INSERT INTO posts (author_id, title, slug, content, category_id, status, featured_image, meta_title, meta_description, meta_keywords, opengraph_image_url, excerpt, view_count, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())"; // Changed user_id to author_id
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
     error_log("DB Prepare Error (Add Post): " . $conn->error . " SQL: " . $sql);
     $_SESSION['flash_message'] = "Database error preparing statement for adding post. Check error logs.";
     $_SESSION['flash_message_type'] = "error";
-    $_SESSION['form_data'] = $_POST;
+    $_SESSION['form_data'] = $_POST; // Preserve form data, including selected author_id
     header('Location: ' . $admin_base_url . 'index.php?admin_page=add_post');
     exit;
 }
 
-// Order: user_id (i), title (s), slug (s), content (s), category_id (i), status (s),
+// Order: author_id (i), title (s), slug (s), content (s), category_id (i), status (s),
 // featured_image (s), meta_title (s), meta_description (s), meta_keywords (s), opengraph_image_url (s), excerpt (s)
-$stmt->bind_param("isssisssssss", // Changed from isssisssss
-    $user_id, $title, $slug, $clean_content, $category_id_to_save, $status_to_save,
+$stmt->bind_param("isssisssssss",
+    $author_id_to_save, $title, $slug, $clean_content, $category_id_to_save, $status_to_save,
     $featured_image_filename, $meta_title_to_save, $meta_description_to_save, $meta_keywords_to_save, $opengraph_image_url_to_save, $excerpt_to_save
 );
 
