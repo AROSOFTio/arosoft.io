@@ -19,24 +19,7 @@ if (file_exists($htmlPurifierPath)) {
     require_once $htmlPurifierPath;
     $purifier_config = HTMLPurifier_Config::createDefault();
 
-    // Enable HTML5 features
-    $purifier_config->set('HTML.DefinitionID', 'html5-definitions');
-    $purifier_config->set('HTML.DefinitionRev', 1);
-    // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional'); // HTML5 definition handles this better
-
-    // Allow proper HTML5 doctype if needed, or let HTMLPurifier handle it with its own mechanisms.
-    // For broader compatibility with HTML5, ensuring the lexer supports it is key.
-    // $purifier_config->set('Core.LexerImpl', 'DirectLex'); // Might be needed for full HTML5 parsing if default isn't sufficient
-
-    if ($def = $purifier_config->maybeGetRawHTMLDefinition()) {
-        // Add figure and figcaption
-        $figure_def = $def->addElement('figure', 'Block', 'Flow', 'Common');
-        $figure_def->excludes = array('figure' => true); // Figure cannot contain another figure directly
-
-        $def->addElement('figcaption', 'Block', 'Flow', 'Common', 'figure'); // Define figcaption as child of figure
-        // Add other HTML5 elements if TinyMCE outputs them, e.g., article, section, time
-    }
-
+    // Set all basic directives first
     $purifier_config->set('HTML.AllowedElements', [
         'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'span',
         'ul', 'ol', 'li',
@@ -44,28 +27,49 @@ if (file_exists($htmlPurifierPath)) {
         'img[src|alt|title|width|height|style]',
         'h2', 'h3', 'h4', 'h5', 'h6',
         'blockquote', 'pre', 'code',
-        'figure', 'figcaption', // Ensure they are listed here too
-        'iframe[src|width|height|frameborder|allow|allowfullscreen|style|scrolling|title|name|id|class|loading]' // Added iframe for media embeds
+        'figure', 'figcaption',
+        'iframe[src|width|height|frameborder|allow|allowfullscreen|style|scrolling|title|name|id|class|loading]'
     ]);
-
-    // Whitelist CSS properties if 'style' attribute is allowed (e.g. for images, iframes)
     $purifier_config->set('CSS.AllowedProperties', [
         'text-align', 'float', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
         'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom',
         'width', 'height', 'border', 'border-collapse', 'border-spacing', 'list-style-type',
         'color', 'background-color', 'font-weight', 'font-style', 'text-decoration',
-        'display' // Allow display for things like inline-block, block, none
+        'display'
     ]);
-
-    $purifier_config->set('HTML.TargetBlank', true); // Open external links in new tab
+    $purifier_config->set('HTML.TargetBlank', true);
     $purifier_config->set('AutoFormat.AutoParagraph', true);
-    $purifier_config->set('AutoFormat.RemoveEmpty', true); // Removes empty paragraphs
-
-    // Allow 'data' URI scheme for pasted images (TinyMCE's paste_data_images: true)
+    $purifier_config->set('AutoFormat.RemoveEmpty', true);
     $purifier_config->set('URI.AllowedSchemes', [
         'http' => true, 'https' => true, 'mailto' => true, 'ftp' => true,
         'nntp' => true, 'news' => true, 'data' => true
     ]);
+    // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional'); // Keep commented, HTML5 handling is preferred
+
+    // Now, handle HTML5 definition extensions
+    // Using a more specific DefinitionID and incrementing Rev
+    $purifier_config->set('HTML.DefinitionID', 'arosoft-html5-definitions');
+    $purifier_config->set('HTML.DefinitionRev', 2);
+
+    if ($def = $purifier_config->maybeGetRawHTMLDefinition()) {
+        // Add figure element if not already defined
+        if (empty($def->info['figure'])) {
+            $figure_el = $def->addElement('figure', 'Block', 'Flow', 'Common');
+            $figure_el->excludes = array('figure' => true); // Figure cannot contain another figure directly
+        }
+
+        // Add figcaption element if not already defined, specifying it's a child of figure
+        if (empty($def->info['figcaption'])) {
+            $def->addElement('figcaption', 'Block', 'Flow', 'Common', 'figure');
+        }
+
+        // iframe is defined via HTML.AllowedElements. If more complex attribute handling
+        // or content model rules were needed for iframe, they could be added here.
+        // For example, to ensure iframe contents are sandboxed if required:
+        // if (!empty($def->info['iframe'])) {
+        //     $def->addAttribute('iframe', 'sandbox', 'Text'); // Example, if sandbox attribute is desired
+        // }
+    }
 
     $purifier = new HTMLPurifier($purifier_config);
 } else {
