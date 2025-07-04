@@ -131,9 +131,29 @@ $meta_keywords = trim($_POST['post_meta_keywords'] ?? '');
 $meta_title = trim($_POST['post_meta_title'] ?? ''); // New field
 $opengraph_image_url = trim($_POST['post_opengraph_image_url'] ?? ''); // New field
 $excerpt = trim($_POST['post_excerpt'] ?? '');
+$post_author_id_input = $_POST['post_author_id'] ?? null;
     
 // Validate form data
 $errors = [];
+
+// Validate author ID
+if (empty($post_author_id_input) || !filter_var($post_author_id_input, FILTER_VALIDATE_INT) || (int)$post_author_id_input <= 0) {
+    $errors[] = "A valid author must be selected.";
+} else {
+    // Check if author exists
+    $author_check_stmt = $conn->prepare("SELECT id FROM admin_users WHERE id = ?");
+    if ($author_check_stmt) {
+        $author_check_stmt->bind_param("i", $post_author_id_input);
+        $author_check_stmt->execute();
+        $author_check_stmt->store_result();
+        if ($author_check_stmt->num_rows == 0) {
+            $errors[] = "Selected author is invalid.";
+        }
+        $author_check_stmt->close();
+    } else {
+        $errors[] = "Database error validating author.";
+    }
+}
 
 // Validate Open Graph Image URL
 if (!empty($opengraph_image_url) && !filter_var($opengraph_image_url, FILTER_VALIDATE_URL)) {
@@ -233,9 +253,11 @@ $meta_description_to_save = empty($meta_description) ? null : $meta_description;
 $meta_keywords_to_save = empty($meta_keywords) ? null : $meta_keywords;
 $opengraph_image_url_to_save = empty($opengraph_image_url) ? null : $opengraph_image_url; // New
 $excerpt_to_save = empty($excerpt) ? null : $excerpt;
+$author_id_to_save = (int)$post_author_id_input; // Already validated
 
 // Prepare update query
 $sql = "UPDATE posts SET 
+    author_id = ?,
     title = ?, 
     slug = ?, 
     content = ?, 
@@ -248,7 +270,7 @@ $sql = "UPDATE posts SET
     opengraph_image_url = ?,
     excerpt = ?, 
     updated_at = NOW() 
-WHERE id = ?"; // Added meta_title, opengraph_image_url
+WHERE id = ?"; // Added author_id
 
 // Execute update
 $stmt = $conn->prepare($sql);
@@ -261,7 +283,9 @@ if (!$stmt) {
     exit;
 }
 
-$stmt->bind_param("sssisssssssi", // Changed from sssisssssi
+// New bind_param string: isssisssssssi (i for author_id at the beginning)
+$stmt->bind_param("isssisssssssi",
+    $author_id_to_save,
     $title, 
     $slug, 
     $clean_content, 
