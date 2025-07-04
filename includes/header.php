@@ -157,9 +157,9 @@ $main_nav_links = [
   <div class="bg-neutral text-neutral-content/70 py-2 px-4 sm:px-6 lg:px-8 border-b border-neutral-light text-xs print:hidden">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex space-x-4">
-        <a href="<?= rtrim(BASE_URL, '/'); ?>/about"   class="hover:text-secondary transition-colors">About Us</a>
-        <a href="<?= rtrim(BASE_URL, '/'); ?>/contact" class="hover:text-secondary transition-colors">Contact</a>
-        <a href="<?= rtrim(BASE_URL, '/'); ?>/privacy" class="hover:text-secondary transition-colors">Privacy Policy</a>
+        <a href="<?= BASE_URL; ?>index.php?page=about"   class="hover:text-secondary transition-colors">About Us</a>
+        <a href="<?= BASE_URL; ?>index.php?page=contact" class="hover:text-secondary transition-colors">Contact</a>
+        <a href="<?= BASE_URL; ?>index.php?page=privacy" class="hover:text-secondary transition-colors">Privacy Policy</a>
       </div>
       <div class="flex space-x-3 items-center">
         <a href="#" aria-label="Facebook"  class="hover:text-secondary transition-colors"><i data-lucide="facebook"  class="w-4 h-4"></i></a>
@@ -178,7 +178,7 @@ $main_nav_links = [
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <!-- Logo / Site Name -->
-        <a href="<?= rtrim(BASE_URL, '/'); ?>/" class="flex items-center space-x-2 shrink-0">
+        <a href="<?= BASE_URL; ?>index.php?page=home" class="flex items-center space-x-2 shrink-0">
           <i data-lucide="cpu" class="w-8 h-8 text-secondary"></i>
           <span class="font-display text-xl sm:text-2xl font-bold text-text hover:text-secondary transition-colors"><?= SITE_NAME; ?></span>
         </a>
@@ -186,7 +186,7 @@ $main_nav_links = [
         <!-- Desktop Menu -->
         <nav class="hidden md:flex items-center space-x-6">
           <?php foreach ($main_nav_links as $link_item): ?>
-            <?php $link_url = rtrim(BASE_URL, '/') . '/' . $link_item['page']; ?>
+            <?php $link_url = BASE_URL . 'index.php?page=' . $link_item['page']; ?>
             <?php $is_active = ($current_public_page === $link_item['page']); ?>
             <?php if (isset($link_item['is_mega_menu']) && $link_item['is_mega_menu']): ?>
               <div class="group relative">
@@ -200,7 +200,7 @@ $main_nav_links = [
                 <div class="mega-menu-container absolute top-full left-1/2 transform -translate-x-1/2 mt-0 w-max min-w-[560px] pt-1">
                   <div class="bg-neutral shadow-2xl rounded-b-lg border-t-2 border-secondary p-6 grid grid-cols-2 gap-x-6 gap-y-4">
                     <?php foreach ($services_menu_items_header as $s_item): ?>
-                      <a href="<?= rtrim(BASE_URL, '/') . '/' . $s_item['page']; ?>"
+                      <a href="<?= BASE_URL . 'index.php?page=' . $s_item['page']; ?>"
                          class="p-3 rounded-lg flex items-start space-x-3 transition-colors bg-neutral hover:bg-neutral-focus hover:text-white">
                         <i data-lucide="<?= $s_item['icon']; ?>" class="w-6 h-6 text-secondary mt-1"></i>
                         <div>
@@ -246,7 +246,7 @@ $main_nav_links = [
     <div id="mobileMenu" class="mobile-menu hidden bg-neutral border-t border-neutral-lighter/50 absolute w-full shadow-xl left-0">
       <nav class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
         <?php foreach ($main_nav_links as $link_item): ?>
-          <?php $link_url_mobile = rtrim(BASE_URL, '/') . '/' . $link_item['page']; ?>
+          <?php $link_url_mobile = BASE_URL . 'index.php?page=' . $link_item['page']; ?>
           <?php $is_active_mobile = ($current_public_page === $link_item['page']); ?>
           <a href="<?= $link_url_mobile; ?>"
              class="block px-3 py-3 rounded-md text-base font-medium <?= $is_active_mobile ? 'text-secondary bg-neutral-focus' : 'text-text/80 hover:bg-neutral-focus hover:text-white'; ?> transition-colors flex items-center space-x-2">
@@ -256,7 +256,7 @@ $main_nav_links = [
           <?php if (isset($link_item['is_mega_menu']) && $link_item['is_mega_menu']): ?>
             <div class="pl-5 space-y-1 border-l-2 border-neutral-focus ml-2.5 mb-2">
               <?php foreach ($services_menu_items_header as $s_item): ?>
-                <a href="<?= rtrim(BASE_URL, '/') . '/' . $s_item['page']; ?>"
+                <a href="<?= BASE_URL . 'index.php?page=' . $s_item['page']; ?>"
                    class="block px-3 py-2 rounded-md text-sm font-medium text-text/80 hover:bg-neutral-focus hover:text-white transition-colors flex items-center space-x-2">
                   <i data-lucide="<?= $s_item['icon']; ?>" class="w-4 h-4"></i>
                   <span><?= esc_html($s_item['name']); ?></span>
