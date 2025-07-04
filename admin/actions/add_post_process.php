@@ -23,12 +23,12 @@ if (file_exists($htmlPurifierPath)) {
     $purifier_config->set('HTML.AllowedElements', [
         'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'span',
         'ul', 'ol', 'li',
-        'a[href|title|target]',
-        'img[src|alt|title|width|height|style]',
+        'a[href|title|target]', // Will keep this simple one as is for now
+        'img', // Simplified: attributes will be added programmatically
         'h2', 'h3', 'h4', 'h5', 'h6',
         'blockquote', 'pre', 'code',
         'figure', 'figcaption',
-        'iframe[src|width|height|frameborder|allow|allowfullscreen|style|scrolling|title|name|id|class|loading]'
+        'iframe' // Simplified: attributes will be added programmatically
     ]);
     $purifier_config->set('CSS.AllowedProperties', [
         'text-align', 'float', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
@@ -47,28 +47,47 @@ if (file_exists($htmlPurifierPath)) {
     // $purifier_config->set('HTML.Doctype', 'HTML 4.01 Transitional'); // Keep commented, HTML5 handling is preferred
 
     // Now, handle HTML5 definition extensions
-    // Using a more specific DefinitionID and incrementing Rev
     $purifier_config->set('HTML.DefinitionID', 'arosoft-html5-definitions');
-    $purifier_config->set('HTML.DefinitionRev', 2);
+    $purifier_config->set('HTML.DefinitionRev', 3); // Incremented due to attribute definition changes
 
     if ($def = $purifier_config->maybeGetRawHTMLDefinition()) {
         // Add figure element if not already defined
         if (empty($def->info['figure'])) {
             $figure_el = $def->addElement('figure', 'Block', 'Flow', 'Common');
-            $figure_el->excludes = array('figure' => true); // Figure cannot contain another figure directly
+            $figure_el->excludes = array('figure' => true);
         }
 
-        // Add figcaption element if not already defined, specifying it's a child of figure
+        // Add figcaption element if not already defined
         if (empty($def->info['figcaption'])) {
             $def->addElement('figcaption', 'Block', 'Flow', 'Common', 'figure');
         }
 
-        // iframe is defined via HTML.AllowedElements. If more complex attribute handling
-        // or content model rules were needed for iframe, they could be added here.
-        // For example, to ensure iframe contents are sandboxed if required:
-        // if (!empty($def->info['iframe'])) {
-        //     $def->addAttribute('iframe', 'sandbox', 'Text'); // Example, if sandbox attribute is desired
-        // }
+        // Programmatically add attributes for img
+        if (!empty($def->info['img'])) {
+            $def->addAttribute('img', 'src', 'URI');
+            $def->addAttribute('img', 'alt', 'Text');
+            $def->addAttribute('img', 'title', 'Text');
+            $def->addAttribute('img', 'width', 'Length');
+            $def->addAttribute('img', 'height', 'Length');
+            $def->addAttribute('img', 'style', 'CSS');
+        }
+
+        // Programmatically add attributes for iframe
+        if (!empty($def->info['iframe'])) {
+            $def->addAttribute('iframe', 'src', 'URI#embedded'); // Allow embedded resources
+            $def->addAttribute('iframe', 'width', 'Length');
+            $def->addAttribute('iframe', 'height', 'Length');
+            $def->addAttribute('iframe', 'frameborder', 'Enum#0,1'); // HTML5 doesn't use frameborder, but often present
+            $def->addAttribute('iframe', 'allow', 'Text'); // For permissions policy
+            $def->addAttribute('iframe', 'allowfullscreen', 'Bool');
+            $def->addAttribute('iframe', 'style', 'CSS');
+            $def->addAttribute('iframe', 'scrolling', 'Enum#yes,no,auto');
+            $def->addAttribute('iframe', 'title', 'Text');
+            $def->addAttribute('iframe', 'name', 'Text'); // CDATA might be more accurate
+            $def->addAttribute('iframe', 'id', 'ID');
+            $def->addAttribute('iframe', 'class', 'Text'); // CDATA for space-separated list
+            $def->addAttribute('iframe', 'loading', 'Enum#lazy,eager');
+        }
     }
 
     $purifier = new HTMLPurifier($purifier_config);
